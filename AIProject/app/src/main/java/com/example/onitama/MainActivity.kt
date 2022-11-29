@@ -34,6 +34,8 @@ class MainActivity : AppCompatActivity() {
     var xMovePossible = ArrayList<Int>()
     var yMovePossible = ArrayList<Int>()
 
+    var idx = mutableListOf<Int>(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -213,32 +215,14 @@ class MainActivity : AppCompatActivity() {
 
         playing_card = ArrayList()
 
-        var idx = mutableListOf<Int>()
-        idx.add(0)
-        idx.add(1)
-        idx.add(2)
-        idx.add(3)
-        idx.add(4)
-        idx.add(5)
-        idx.add(6)
-        idx.add(7)
-        idx.add(8)
-        idx.add(9)
-        idx.add(10)
-        idx.add(11)
-        idx.add(12)
-        idx.add(13)
-        idx.add(14)
-        idx.add(15)
+
 
         idx.shuffle()
 
-        playing_card.add(cards[idx[0]])
-        playing_card.add(cards[idx[1]])
-        playing_card.add(cards[idx[2]])
-        playing_card.add(cards[idx[3]])
-        playing_card.add(cards[idx[4]])
-        
+        for(i in 0 until 4){
+            playing_card.add(cards[idx[i]])
+        }
+
 
 //        for(i in 0..4){
 //            var check = true
@@ -378,7 +362,7 @@ class MainActivity : AppCompatActivity() {
                         rotateCard()
                         clearSelectedPiece()
                         playerTurn = false
-                        //AI_Move()
+                        AI_Move()
                     }else{ Toast.makeText(this, "This move is Illegal!", Toast.LENGTH_SHORT).show() }
                 }else{ Toast.makeText(this, "Please select card first!", Toast.LENGTH_SHORT).show() }
             }
@@ -426,8 +410,8 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 else{
-                    possible_y = selectedPiece.y+(selectedCard.yMove[i] * -1)
-                    possible_x = selectedPiece.x+(selectedCard.xMove[i]*-1)
+                    possible_y = selectedPiece.y+(selectedCard.yMove[i] )
+                    possible_x = selectedPiece.x+(selectedCard.xMove[i])
                     for(j in 0..AI_Pieces.size-1){
                         if(possible_x == AI_Pieces[j].x && possible_y == AI_Pieces[j].y){
                             isMovePossible = false
@@ -459,7 +443,7 @@ class MainActivity : AppCompatActivity() {
         selectedPiece.y = y
     }
     fun rotateCard(){
-        val tempCard = playing_card[2]
+        val tempCard = playing_card[selectedCardIdx]
         playing_card[2] = playing_card[selectedCardIdx]
         playing_card[selectedCardIdx] = tempCard
         initPanelCard()
