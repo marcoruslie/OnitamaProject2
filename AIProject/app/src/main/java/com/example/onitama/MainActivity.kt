@@ -29,6 +29,8 @@ class MainActivity : AppCompatActivity() {
     var selectedCard = Card("", intArrayOf(), intArrayOf())
     var selectedCardIdx = -1
 
+    var playerTurn = true;
+
     var xMovePossible = ArrayList<Int>()
     var yMovePossible = ArrayList<Int>()
 
@@ -54,10 +56,30 @@ class MainActivity : AppCompatActivity() {
 
         // CARD ON CLICK LISTENER
         cardEnemy1.setOnClickListener {
+            if(isUnitSelected) {
+                if (isCardSelected) {
+                    clearPossibleMove()
+                }
+                selectedCard = playing_card[0]
+                selectedCardIdx = 0
+                cardEnemy1.setBackgroundColor(Color.GRAY)
+                cardEnemy2.setBackgroundColor(Color.TRANSPARENT)
+                isCardSelected = true
 
+                generatePossibleMove()
+            }
         }
         cardEnemy2.setOnClickListener {
+            if(isUnitSelected){
+                if(isCardSelected){ clearPossibleMove() }
+                selectedCard = playing_card[1]
+                selectedCardIdx = 1
+                cardEnemy2.setBackgroundColor(Color.GRAY)
+                cardEnemy1.setBackgroundColor(Color.TRANSPARENT)
+                isCardSelected = true
 
+                generatePossibleMove()
+            }
         }
 
         cardPlayer1.setOnClickListener {
@@ -190,13 +212,41 @@ class MainActivity : AppCompatActivity() {
         // RANDOM 5 CARD TO PLAY WITH
 
         playing_card = ArrayList()
+
+        var idx = mutableListOf<Int>()
+        idx.add(0)
+        idx.add(1)
+        idx.add(2)
+        idx.add(3)
+        idx.add(4)
+        idx.add(5)
+        idx.add(6)
+        idx.add(7)
+        idx.add(8)
+        idx.add(9)
+        idx.add(10)
+        idx.add(11)
+        idx.add(12)
+        idx.add(13)
+        idx.add(14)
+        idx.add(15)
+
+        idx.shuffle()
+
+        playing_card.add(cards[idx[0]])
+        playing_card.add(cards[idx[1]])
+        playing_card.add(cards[idx[2]])
+        playing_card.add(cards[idx[3]])
+        playing_card.add(cards[idx[4]])
+        
+
 //        for(i in 0..4){
 //            var check = true
 //            var idx : Int
 //            do {
-//                idx = (0..15).shuffled().last()
+//                idx = (0..15).shuffled().first()
 //                for (card in playing_card){
-//                    if(card.cardName.equals(cards[idx].cardName)){
+//                    if(card.cardName == cards[idx].cardName){
 //                        check = false
 //                    }
 //                }
@@ -206,11 +256,11 @@ class MainActivity : AppCompatActivity() {
 //            }while(!check)
 //        }
 
-        playing_card.add(cards[0])
-        playing_card.add(cards[1])
-        playing_card.add(cards[2])
-        playing_card.add(cards[3])
-        playing_card.add(cards[4])
+//        playing_card.add(cards[0])
+//        playing_card.add(cards[1])
+//        playing_card.add(cards[2])
+//        playing_card.add(cards[3])
+//        playing_card.add(cards[4])
     }
     fun initPanelCard(){
         // Initiate Card Panel
@@ -327,7 +377,8 @@ class MainActivity : AppCompatActivity() {
                         movePiece(x,y)
                         rotateCard()
                         clearSelectedPiece()
-
+                        playerTurn = false
+                        //AI_Move()
                     }else{ Toast.makeText(this, "This move is Illegal!", Toast.LENGTH_SHORT).show() }
                 }else{ Toast.makeText(this, "Please select card first!", Toast.LENGTH_SHORT).show() }
             }
@@ -367,9 +418,20 @@ class MainActivity : AppCompatActivity() {
                 var isMovePossible = true
 
                 // LOOP TO CHECK IF MOVEMENT OF THE CARD IS ATTACKING TEAMATES POSITION
-                for(j in 0..Player_Pieces.size-1){
-                    if(possible_x == Player_Pieces[j].x && possible_y == Player_Pieces[j].y){
-                        isMovePossible = false
+                if(playerTurn){
+                    for(j in 0..Player_Pieces.size-1){
+                        if(possible_x == Player_Pieces[j].x && possible_y == Player_Pieces[j].y){
+                            isMovePossible = false
+                        }
+                    }
+                }
+                else{
+                    possible_y = selectedPiece.y+(selectedCard.yMove[i] * -1)
+                    possible_x = selectedPiece.x+(selectedCard.xMove[i]*-1)
+                    for(j in 0..AI_Pieces.size-1){
+                        if(possible_x == AI_Pieces[j].x && possible_y == AI_Pieces[j].y){
+                            isMovePossible = false
+                        }
                     }
                 }
 
@@ -404,6 +466,25 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun AI_Move(){
+        //PLY 1
+        if(!playerTurn){
+            for (k in 0 until AI_Pieces.size - 1){
+                if(k==0) {
+                    selectedPiece = AI_Pieces[k]
+                    for (i in 0..1) {
+                        for (j in 0 until playing_card[i].xMove.size - 1) {
+                            isUnitSelected = true
+                            cardEnemy1.performClick()
+                            boardClicked(
+                                playing_card[i].xMove[j] * -1,
+                                playing_card[i].yMove[j] * -1
+                            )
+                        }
+                    }
+                }
+            }
+            playerTurn = !playerTurn
+        }
 
     }
 }
