@@ -74,8 +74,10 @@ class MainActivity : AppCompatActivity() {
         cardEnemy2.setOnClickListener {
             if(isUnitSelected){
                 if(isCardSelected){ clearPossibleMove() }
+
                 selectedCard = playing_card[1]
                 selectedCardIdx = 1
+
                 cardEnemy2.setBackgroundColor(Color.GRAY)
                 cardEnemy1.setBackgroundColor(Color.TRANSPARENT)
                 isCardSelected = true
@@ -177,8 +179,8 @@ class MainActivity : AppCompatActivity() {
         createCard("Goose",xMove,yMove)
 
         // 11. Horse : [0,-1],[-1,0],[0,1]
-        xMove = intArrayOf(-1,-1,1,1)
-        yMove = intArrayOf(-1,0,-1,0)
+        xMove = intArrayOf(0,-1,0)
+        yMove = intArrayOf(-1,0,1)
         createCard("Horse",xMove,yMove)
 
         // 12. Eel : [-1,-1],[1,0],[-1,1]
@@ -336,8 +338,13 @@ class MainActivity : AppCompatActivity() {
                         movePiece(x,y)
                         rotateCard()
                         clearSelectedPiece()
-                        playerTurn = false
-                        AI_Move()
+                        playerTurn = !playerTurn
+                        Toast.makeText(this, "${playerTurn.toString()}", Toast.LENGTH_SHORT).show()
+                        if(!playerTurn){
+                            Toast.makeText(this, "AI has moved it's piece! Move your piece now!", Toast.LENGTH_SHORT).show()
+                            AI_Move()
+                        }
+
                     }else{ Toast.makeText(this, "This move is Illegal!", Toast.LENGTH_SHORT).show() }
                 }else{ Toast.makeText(this, "Please select card first!", Toast.LENGTH_SHORT).show() }
             }
@@ -359,6 +366,9 @@ class MainActivity : AppCompatActivity() {
         selectedCard = Card("", intArrayOf(), intArrayOf())
         cardPlayer1.setBackgroundColor(Color.TRANSPARENT)
         cardPlayer2.setBackgroundColor(Color.TRANSPARENT)
+
+        cardEnemy1.setBackgroundColor(Color.TRANSPARENT)
+        cardEnemy2.setBackgroundColor(Color.TRANSPARENT)
     }
     fun clearPossibleMove(){
         for(i in 0..xMovePossible.size-1){
@@ -385,8 +395,8 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
                 else{
-                    possible_y = selectedPiece.y+(selectedCard.yMove[i] )
-                    possible_x = selectedPiece.x+(selectedCard.xMove[i])
+                    possible_y = selectedPiece.y+(selectedCard.yMove[i]*-1)
+                    possible_x = selectedPiece.x+(selectedCard.xMove[i]*-1)
                     for(j in 0..AI_Pieces.size-1){
                         if(possible_x == AI_Pieces[j].x && possible_y == AI_Pieces[j].y){
                             isMovePossible = false
@@ -406,7 +416,13 @@ class MainActivity : AppCompatActivity() {
     fun movePiece(x:Int,y:Int){
         clearPossibleMove()
 
-        board[y][x].setBackgroundColor(Color.GREEN)
+        if(playerTurn){
+            // PLAYER MOVES
+            board[y][x].setBackgroundColor(Color.GREEN)
+        }else{
+            // AI MOVES
+            board[y][x].setBackgroundColor(Color.RED)
+        }
         if(!selectedPiece.isKing){ board[y][x].setText("P") }
         else{ board[y][x].setText("K") }
 
@@ -418,7 +434,7 @@ class MainActivity : AppCompatActivity() {
         selectedPiece.y = y
     }
     fun rotateCard(){
-        val tempCard = playing_card[selectedCardIdx]
+        val tempCard = playing_card[2]
         playing_card[2] = playing_card[selectedCardIdx]
         playing_card[selectedCardIdx] = tempCard
         initPanelCard()
@@ -428,22 +444,26 @@ class MainActivity : AppCompatActivity() {
         //PLY 1
         if(!playerTurn){
             for (k in 0 until AI_Pieces.size - 1){
-                if(k==0) {
+                if(k == 0) {
                     selectedPiece = AI_Pieces[k]
-                    for (i in 0..1) {
-                        for (j in 0 until playing_card[i].xMove.size - 1) {
-                            isUnitSelected = true
-                            var randomAICard = random.nextInt
-                            cardEnemy2.performClick()
-                            boardClicked(
-                                playing_card[i].xMove[j] * -1,
-                                playing_card[i].yMove[j] * -1
-                            )
-                        }
+                    isUnitSelected = true
+                    // TRACE EVERY AI CARD
+
+                    // SECOND AI CARD
+                    cardEnemy2.performClick()
+                    if(xMovePossible.size > 0){
+                        boardClicked(
+                            (xMovePossible[0]),
+                            (yMovePossible[0])
+                        )
+//                        for (j in 0 until playing_card[1].xMove.size - 1) {
+//                            // MOVE BASED ON GENERATED MOVE
+//
+//                        }
                     }
+                    // FIRST AI CARD
                 }
             }
-            playerTurn = !playerTurn
         }
 
     }
