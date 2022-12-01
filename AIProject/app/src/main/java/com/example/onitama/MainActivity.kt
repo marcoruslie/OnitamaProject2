@@ -187,8 +187,8 @@ class MainActivity : AppCompatActivity() {
         createCard("Eel",xMove,yMove)
 
         // 13. Rabbit : [-1,1],[1,-1],[2,0]
-        xMove = intArrayOf(-1,-1,2)
-        yMove = intArrayOf(-1,-1,0)
+        xMove = intArrayOf(-1,1,2)
+        yMove = intArrayOf(1,-1,0)
         createCard("Rabbit",xMove,yMove)
 
         // 14. Rooster : [-1,0],[-1,-1],[1,0],[1,-1]
@@ -215,36 +215,11 @@ class MainActivity : AppCompatActivity() {
 
         playing_card = ArrayList()
 
-
-
         idx.shuffle()
 
-        for(i in 0 until 4){
+        for(i in 0 until 5){
             playing_card.add(cards[idx[i]])
         }
-
-
-//        for(i in 0..4){
-//            var check = true
-//            var idx : Int
-//            do {
-//                idx = (0..15).shuffled().first()
-//                for (card in playing_card){
-//                    if(card.cardName == cards[idx].cardName){
-//                        check = false
-//                    }
-//                }
-//                if(check){
-//                    playing_card.add(cards[idx])
-//                }
-//            }while(!check)
-//        }
-
-//        playing_card.add(cards[0])
-//        playing_card.add(cards[1])
-//        playing_card.add(cards[2])
-//        playing_card.add(cards[3])
-//        playing_card.add(cards[4])
     }
     fun initPanelCard(){
         // Initiate Card Panel
@@ -369,7 +344,7 @@ class MainActivity : AppCompatActivity() {
             else{
                 // CANCEL SELECTED PAWN
                 board[y][x].setBackgroundColor(Color.GREEN)
-                rotateCard()
+//                rotateCard()
                 clearPossibleMove()
                 clearSelectedPiece()
             }
@@ -458,7 +433,8 @@ class MainActivity : AppCompatActivity() {
                     for (i in 0..1) {
                         for (j in 0 until playing_card[i].xMove.size - 1) {
                             isUnitSelected = true
-                            cardEnemy1.performClick()
+                            var randomAICard = random.nextInt
+                            cardEnemy2.performClick()
                             boardClicked(
                                 playing_card[i].xMove[j] * -1,
                                 playing_card[i].yMove[j] * -1
