@@ -35,6 +35,9 @@ class MainActivity : AppCompatActivity() {
     var yMovePossible = ArrayList<Int>()
 
     var idx = mutableListOf<Int>(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
+    var bestMoveScore = 0
+    var bestMove:IntArray = intArrayOf(0,0)
+    var best_ai_card_idx = -1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -156,7 +159,7 @@ class MainActivity : AppCompatActivity() {
         // 6. Elephant : [-1,-1],[-1,0],[1,-1],[1,0]
         xMove = intArrayOf(-1,-1,1,1)
         yMove = intArrayOf(-1,0,-1,0)
-        createCard("Crab",xMove,yMove)
+        createCard("Elephant",xMove,yMove)
 
         // 7. Mantis : [-1,-1],[0,1],[1,-1]
         xMove = intArrayOf(-1,0,1)
@@ -193,9 +196,9 @@ class MainActivity : AppCompatActivity() {
         yMove = intArrayOf(1,-1,0)
         createCard("Rabbit",xMove,yMove)
 
-        // 14. Rooster : [-1,0],[-1,-1],[1,0],[1,-1]
+        // 14. Rooster : [-1,0],[-1,1],[1,0],[1,-1]
         xMove = intArrayOf(-1,-1,1,1)
-        yMove = intArrayOf(0,-1,0,-1)
+        yMove = intArrayOf(0,1,0,-1)
         createCard("Rooster",xMove,yMove)
 
         // 15. Ox : [0,-1],[1,0],[0,1]
@@ -248,6 +251,12 @@ class MainActivity : AppCompatActivity() {
         val btn: Drawable = resources.getDrawable(resourceID)
         return btn
     }
+    fun btnChangeIcon(name:String): Drawable {
+        val tileID = name
+        val resourceID = this.resources.getIdentifier(tileID.lowercase(), "drawable", packageName)
+        val btn: Drawable = resources.getDrawable(resourceID)
+        return btn
+    }
 
     // BOARD & PIECE RELATED FUNCTION
     fun initBoard(){
@@ -279,22 +288,33 @@ class MainActivity : AppCompatActivity() {
         for (i in 0..1){
             for (j in 0..4){
                 var isKing = false
-                var role = "P"
+
                 if(j == 2){
                     isKing = true
-                    role = "K"
+
                 }
 
                 var new_piece = Piece(j,yPiece,isKing)
                 if(yPiece == 0){
                     AI_Pieces.add(new_piece)
-                    board[new_piece.y][new_piece.x].setBackgroundColor(Color.RED)
+                    if(isKing){
+                        board[yPiece][j].setCompoundDrawablesWithIntrinsicBounds(imageSelect("black_king"),null,null,null)
+                    }
+                    else{
+                        board[yPiece][j].setCompoundDrawablesWithIntrinsicBounds(imageSelect("black_pawn"),null,null,null)
+                    }
                 }
                 else{
                     Player_Pieces.add(new_piece)
-                    board[new_piece.y][new_piece.x].setBackgroundColor(Color.GREEN)
+                    if(isKing){
+                        board[yPiece][j].setCompoundDrawablesWithIntrinsicBounds(imageSelect("white_king"),null,null,null)
+                    }
+                    else{
+                        board[yPiece][j].setCompoundDrawablesWithIntrinsicBounds(imageSelect("white_pawn"),null,null,null)
+                    }
+
                 }
-                board[new_piece.y][new_piece.x].setText(role)
+
             }
             yPiece = 4
         }
@@ -328,11 +348,13 @@ class MainActivity : AppCompatActivity() {
                         IF MOVE IS LEGAL THEN MOVE SELECTED PIECE TO DESTINATION
                     */
                     var isMoveLegal = false
-                    for(i in 0..xMovePossible.size-1){
-                        if(x == xMovePossible[i] && y == yMovePossible[i]){
-                            isMoveLegal = true
+                    if(playerTurn){
+                        for(i in 0..xMovePossible.size-1){
+                            if(x == xMovePossible[i] && y == yMovePossible[i]){
+                                isMoveLegal = true
+                            }
                         }
-                    }
+                    }else { isMoveLegal = true }
 
                     if(isMoveLegal){
                         movePiece(x,y)
@@ -350,7 +372,7 @@ class MainActivity : AppCompatActivity() {
             }
             else{
                 // CANCEL SELECTED PAWN
-                board[y][x].setBackgroundColor(Color.GREEN)
+                board[y][x].setBackgroundColor(Color.parseColor("#AA9772"))
 //                rotateCard()
                 clearPossibleMove()
                 clearSelectedPiece()
@@ -373,7 +395,6 @@ class MainActivity : AppCompatActivity() {
     fun clearPossibleMove(){
         for(i in 0..xMovePossible.size-1){
             board[yMovePossible[i]][xMovePossible[i]].setBackgroundColor(Color.parseColor("#AA9772"))
-            board[yMovePossible[i]][xMovePossible[i]].setText("")
         }
         xMovePossible.clear()
         yMovePossible.clear()
@@ -418,53 +439,125 @@ class MainActivity : AppCompatActivity() {
 
         if(playerTurn){
             // PLAYER MOVES
-            board[y][x].setBackgroundColor(Color.GREEN)
+            if(!selectedPiece.isKing){ board[y][x].setCompoundDrawablesWithIntrinsicBounds(imageSelect("white_pawn"),null,null,null) }
+            else{ board[y][x].setCompoundDrawablesWithIntrinsicBounds(imageSelect("white_king"),null,null,null) }
+
         }else{
             // AI MOVES
-            board[y][x].setBackgroundColor(Color.RED)
+
+            if(!selectedPiece.isKing){ board[y][x].setCompoundDrawablesWithIntrinsicBounds(imageSelect("black_pawn"),null,null,null) }
+            else{ board[y][x].setCompoundDrawablesWithIntrinsicBounds(imageSelect("black_king"),null,null,null) }
         }
-        if(!selectedPiece.isKing){ board[y][x].setText("P") }
-        else{ board[y][x].setText("K") }
 
         // CLEAR OLD POSITION
+        board[selectedPiece.y][selectedPiece.x].setCompoundDrawablesWithIntrinsicBounds(null,null,null,null)
         board[selectedPiece.y][selectedPiece.x].setBackgroundColor(Color.parseColor("#AA9772"))
-        board[selectedPiece.y][selectedPiece.x].setText("")
+//        board[selectedPiece.y][selectedPiece.x].setText("")
 
         selectedPiece.x = x
         selectedPiece.y = y
     }
     fun rotateCard(){
+        var rotateIdx = selectedCardIdx
+        if(!playerTurn){
+            rotateIdx = best_ai_card_idx
+        }
         val tempCard = playing_card[2]
-        playing_card[2] = playing_card[selectedCardIdx]
-        playing_card[selectedCardIdx] = tempCard
+        playing_card[2] = playing_card[rotateIdx]
+        playing_card[rotateIdx] = tempCard
         initPanelCard()
     }
 
     fun AI_Move(){
         //PLY 1
         if(!playerTurn){
+            bestMoveScore = 0
             for (k in 0 until AI_Pieces.size - 1){
-                if(k == 0) {
+                if(k == 2) {
                     selectedPiece = AI_Pieces[k]
                     isUnitSelected = true
                     // TRACE EVERY AI CARD
 
+                    // FIRST AI CARD
+                    cardEnemy1.performClick()
+                    if(xMovePossible.size > 0) {
+                        for (i in 0..xMovePossible.size-1){
+                            countSBE(xMovePossible[i],yMovePossible[i],selectedPiece.isKing)
+                        }
+                    }
+                    clearPossibleMove()
                     // SECOND AI CARD
                     cardEnemy2.performClick()
-                    if(xMovePossible.size > 0){
-                        boardClicked(
-                            (xMovePossible[0]),
-                            (yMovePossible[0])
-                        )
-//                        for (j in 0 until playing_card[1].xMove.size - 1) {
-//                            // MOVE BASED ON GENERATED MOVE
-//
-//                        }
+                    if(xMovePossible.size > 0) {
+                        for (i in 0..xMovePossible.size-1){
+                            countSBE(xMovePossible[i],yMovePossible[i],selectedPiece.isKing)
+                        }
                     }
-                    // FIRST AI CARD
+
+                    boardClicked(
+                        (bestMove[0]),
+                        (bestMove[1])
+                    )
                 }
             }
         }
+    }
+    fun countSBE(x:Int,y:Int,king_moved:Boolean){
+        for(i in 0..xMovePossible.size-1){
 
+            for(j in 0..Player_Pieces.size-1){
+                if(Player_Pieces[j].isKing && !king_moved){
+                    // Jika yang digerakkan adalah pawn
+
+                    var yDiffFromKing = -1;
+                    var xDiffFromKing = -1;
+
+                    // X DIFFRENCE
+                    if(Player_Pieces[j].x > x){ xDiffFromKing = Player_Pieces[j].x-x }
+                    else{ xDiffFromKing = x-Player_Pieces[j].x }
+                    // Y DIFFRENCE
+                    if(Player_Pieces[j].y > y){ yDiffFromKing = Player_Pieces[j].y-y }
+                    else{ yDiffFromKing = y-Player_Pieces[j].y }
+
+                    // GET BEST SCORE
+                    countMoveScore(xDiffFromKing,yDiffFromKing,x,y)
+//                    Toast.makeText(this, xDiffFromKing.toString()+"-"+yDiffFromKing, Toast.LENGTH_SHORT).show()
+                    break
+                }else{
+                    // Jika yang digerakkan adalah King
+
+                    var yDiffFromBase = -1;
+                    var xDiffFromBase = -1;
+
+                    // X DIFFRENCE
+                    if(x > 2){ xDiffFromBase = x-2 }
+                    else{ xDiffFromBase = 2-x }
+                    // Y DIFFRENCE
+                    yDiffFromBase = 4-y
+
+
+                    // GET BEST SCORE
+                    countMoveScore(xDiffFromBase,yDiffFromBase,x,y)
+//                    Toast.makeText(this, xDiffFromBase.toString()+"-"+yDiffFromBase, Toast.LENGTH_SHORT).show()
+
+                }
+            }
+
+        }
+    }
+    fun countMoveScore(xDiff:Int,yDiff:Int,xMove:Int,yMove:Int){
+        var score = 100
+        var debuff = xDiff*10 + yDiff*10
+
+        score-=debuff
+
+        // MAX SCORE
+        if(score > bestMoveScore){
+            best_ai_card_idx = selectedCardIdx
+            bestMoveScore = score
+            bestMove[0] = xMove
+            bestMove[1] = yMove
+        }
+        Toast.makeText(this, bestMove[0].toString()+"-"+bestMove[1].toString(), Toast.LENGTH_SHORT).show()
     }
 }

@@ -86,7 +86,8 @@
                     android:layout_height="65dp"
                     android:layout_margin="1dp"
                     android:layout_weight="1"
-                    android:onClick="boardClicked" />
+
+                    app:iconTint="@color/black" />
 
                 <Button
                     android:id="@+id/btn2"
@@ -94,7 +95,8 @@
                     android:layout_height="65dp"
                     android:layout_margin="1dp"
                     android:layout_weight="1"
-                    android:onClick="boardClicked" />
+
+                    app:iconTint="@color/black" />
 
                 <Button
                     android:id="@+id/btn3"
@@ -102,7 +104,8 @@
                     android:layout_height="65dp"
                     android:layout_margin="1dp"
                     android:layout_weight="1"
-                    android:onClick="boardClicked" />
+
+                    app:iconTint="@color/black" />
 
                 <Button
                     android:id="@+id/btn4"
@@ -110,14 +113,16 @@
                     android:layout_height="65dp"
                     android:layout_margin="1dp"
                     android:layout_weight="1"
-                    android:onClick="boardClicked" />
+
+                    app:iconTint="@color/black" />
 
                 <Button
                     android:id="@+id/btn5"
                     android:layout_width="match_parent"
                     android:layout_height="65dp"
                     android:layout_margin="1dp"
-                    android:layout_weight="1" />
+                    android:layout_weight="1"
+                    app:iconTint="@color/black" />
             </LinearLayout>
 
             <LinearLayout
@@ -254,7 +259,8 @@
                     android:layout_height="65dp"
                     android:layout_margin="1dp"
                     android:layout_weight="1"
-                    android:onClick="boardClicked" />
+
+                    />
 
                 <Button
                     android:id="@+id/btn22"
@@ -262,7 +268,8 @@
                     android:layout_height="65dp"
                     android:layout_margin="1dp"
                     android:layout_weight="1"
-                    android:onClick="boardClicked" />
+
+                    />
 
                 <Button
                     android:id="@+id/btn23"
@@ -270,7 +277,8 @@
                     android:layout_height="65dp"
                     android:layout_margin="1dp"
                     android:layout_weight="1"
-                    android:onClick="boardClicked" />
+
+                    />
 
                 <Button
                     android:id="@+id/btn24"
@@ -278,7 +286,8 @@
                     android:layout_height="65dp"
                     android:layout_margin="1dp"
                     android:layout_weight="1"
-                    android:onClick="boardClicked" />
+
+                    />
 
                 <Button
                     android:id="@+id/btn25"
@@ -286,7 +295,8 @@
                     android:layout_height="65dp"
                     android:layout_margin="1dp"
                     android:layout_weight="1"
-                    android:onClick="boardClicked" />
+
+                    />
             </LinearLayout>
         </LinearLayout>
 
