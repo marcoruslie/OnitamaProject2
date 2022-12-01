@@ -35,9 +35,13 @@ class MainActivity : AppCompatActivity() {
     var yMovePossible = ArrayList<Int>()
 
     var idx = mutableListOf<Int>(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
+
+    // PLY 1
     var bestMoveScore = 0
     var bestMove:IntArray = intArrayOf(0,0)
     var best_ai_card_idx = -1
+    var selected_piece_idx = -1
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -178,7 +182,7 @@ class MainActivity : AppCompatActivity() {
 
         // 10. Goose : [-1,-1],[-1,0],[1,0],[1,1]
         xMove = intArrayOf(-1,-1,1,1)
-        yMove = intArrayOf(-1,-1,0,1)
+        yMove = intArrayOf(-1,0,0,1)
         createCard("Goose",xMove,yMove)
 
         // 11. Horse : [0,-1],[-1,0],[0,1]
@@ -225,6 +229,12 @@ class MainActivity : AppCompatActivity() {
         for(i in 0 until 5){
             playing_card.add(cards[idx[i]])
         }
+//        playing_card.add(cards[7])
+//        playing_card.add(cards[11])
+//        playing_card.add(cards[9])
+//        playing_card.add(cards[13])
+//        playing_card.add(cards[1])
+
     }
     fun initPanelCard(){
         // Initiate Card Panel
@@ -291,7 +301,6 @@ class MainActivity : AppCompatActivity() {
 
                 if(j == 2){
                     isKing = true
-
                 }
 
                 var new_piece = Piece(j,yPiece,isKing)
@@ -327,7 +336,7 @@ class MainActivity : AppCompatActivity() {
                     // SELECTED PIECE IS PLAYER'S PIECE
                     board[y][x].setBackgroundColor(Color.YELLOW)
                     selectedPiece = Player_Pieces[i]
-                    Toast.makeText(this, "${selectedPiece.getPieceInfo()}", Toast.LENGTH_SHORT).show()
+
                     isUnitSelected = true
                     break
                 }
@@ -361,9 +370,9 @@ class MainActivity : AppCompatActivity() {
                         rotateCard()
                         clearSelectedPiece()
                         playerTurn = !playerTurn
-                        Toast.makeText(this, "${playerTurn.toString()}", Toast.LENGTH_SHORT).show()
+
                         if(!playerTurn){
-                            Toast.makeText(this, "AI has moved it's piece! Move your piece now!", Toast.LENGTH_SHORT).show()
+
                             AI_Move()
                         }
 
@@ -403,12 +412,14 @@ class MainActivity : AppCompatActivity() {
     fun generatePossibleMove(){
         for(i in 0..selectedCard.xMove.size-1){
             try {
-                var possible_y = selectedPiece.y+selectedCard.yMove[i]
-                var possible_x = selectedPiece.x+selectedCard.xMove[i]
+                var possible_y :Int
+                var possible_x :Int
                 var isMovePossible = true
 
                 // LOOP TO CHECK IF MOVEMENT OF THE CARD IS ATTACKING TEAMATES POSITION
                 if(playerTurn){
+                    possible_y = selectedPiece.y+selectedCard.yMove[i]
+                    possible_x = selectedPiece.x+selectedCard.xMove[i]
                     for(j in 0..Player_Pieces.size-1){
                         if(possible_x == Player_Pieces[j].x && possible_y == Player_Pieces[j].y){
                             isMovePossible = false
@@ -439,14 +450,37 @@ class MainActivity : AppCompatActivity() {
 
         if(playerTurn){
             // PLAYER MOVES
-            if(!selectedPiece.isKing){ board[y][x].setCompoundDrawablesWithIntrinsicBounds(imageSelect("white_pawn"),null,null,null) }
-            else{ board[y][x].setCompoundDrawablesWithIntrinsicBounds(imageSelect("white_king"),null,null,null) }
+
+            checkKill(AI_Pieces,x,y)
+            if(selectedPiece.isKing && x==2 && y==0){
+                Toast.makeText(this, "You Win!", Toast.LENGTH_SHORT).show()
+            }
+
+            if(!selectedPiece.isKing){
+                board[y][x].setCompoundDrawablesWithIntrinsicBounds(imageSelect("white_pawn"),null,null,null)
+            }
+            else{
+                board[y][x].setCompoundDrawablesWithIntrinsicBounds(imageSelect("white_king"),null,null,null)
+            }
+
 
         }else{
             // AI MOVES
+            selectedPiece = AI_Pieces[selected_piece_idx]
 
-            if(!selectedPiece.isKing){ board[y][x].setCompoundDrawablesWithIntrinsicBounds(imageSelect("black_pawn"),null,null,null) }
-            else{ board[y][x].setCompoundDrawablesWithIntrinsicBounds(imageSelect("black_king"),null,null,null) }
+            checkKill(Player_Pieces,x,y)
+            if(selectedPiece.isKing && x==2 && y==4){
+                Toast.makeText(this, "You Lose!", Toast.LENGTH_SHORT).show()
+            }
+
+            if(!selectedPiece.isKing){
+
+                board[y][x].setCompoundDrawablesWithIntrinsicBounds(imageSelect("black_pawn"),null,null,null)
+            }
+            else{
+
+                board[y][x].setCompoundDrawablesWithIntrinsicBounds(imageSelect("black_king"),null,null,null)
+            }
         }
 
         // CLEAR OLD POSITION
@@ -461,6 +495,7 @@ class MainActivity : AppCompatActivity() {
         var rotateIdx = selectedCardIdx
         if(!playerTurn){
             rotateIdx = best_ai_card_idx
+
         }
         val tempCard = playing_card[2]
         playing_card[2] = playing_card[rotateIdx]
@@ -472,8 +507,8 @@ class MainActivity : AppCompatActivity() {
         //PLY 1
         if(!playerTurn){
             bestMoveScore = 0
-            for (k in 0 until AI_Pieces.size - 1){
-                if(k == 2) {
+            for (k in 0..AI_Pieces.size - 1){
+//                if(k == 2) {
                     selectedPiece = AI_Pieces[k]
                     isUnitSelected = true
                     // TRACE EVERY AI CARD
@@ -482,7 +517,7 @@ class MainActivity : AppCompatActivity() {
                     cardEnemy1.performClick()
                     if(xMovePossible.size > 0) {
                         for (i in 0..xMovePossible.size-1){
-                            countSBE(xMovePossible[i],yMovePossible[i],selectedPiece.isKing)
+                            countSBE(xMovePossible[i],yMovePossible[i],selectedPiece.isKing,k)
                         }
                     }
                     clearPossibleMove()
@@ -490,29 +525,51 @@ class MainActivity : AppCompatActivity() {
                     cardEnemy2.performClick()
                     if(xMovePossible.size > 0) {
                         for (i in 0..xMovePossible.size-1){
-                            countSBE(xMovePossible[i],yMovePossible[i],selectedPiece.isKing)
+                            countSBE(xMovePossible[i],yMovePossible[i],selectedPiece.isKing,k)
                         }
                     }
-
-                    boardClicked(
-                        (bestMove[0]),
-                        (bestMove[1])
-                    )
-                }
+//                }
             }
+
+
+            boardClicked(
+                (bestMove[0]),
+                (bestMove[1])
+            )
         }
     }
-    fun countSBE(x:Int,y:Int,king_moved:Boolean){
+    fun predictPlayerMove(AI_x:Int,AI_y:Int):Int{
+        //PLY
+        for (i in 0..Player_Pieces.size - 1){
+            // TRACE EVERY PLAYER CARD
+            for(j in 0..playing_card[3].xMove.size-1){
+                var xPredict = playing_card[3].xMove[j]+Player_Pieces[i].x
+                var yPredict = playing_card[3].yMove[j]+Player_Pieces[i].y
+                if(AI_x == xPredict && AI_y == yPredict){
+                    return -20
+                }
+            }
+            for(j in 0..playing_card[4].xMove.size-1){
+                var xPredict = playing_card[4].xMove[j]+Player_Pieces[i].x
+                var yPredict = playing_card[4].yMove[j]+Player_Pieces[i].y
+                if(AI_x == xPredict && AI_y == yPredict){
+                    return -20
+                }
+            }
+
+        }
+        return 0
+    }
+    fun countSBE(x:Int,y:Int,king_moved:Boolean, pieceIdx:Int){
         for(i in 0..xMovePossible.size-1){
-
             for(j in 0..Player_Pieces.size-1){
-                if(Player_Pieces[j].isKing && !king_moved){
-                    // Jika yang digerakkan adalah pawn
-
+                if(!king_moved){
+                    // Jika yang digerakkan adalah pawn dan mengejar raja
                     var yDiffFromKing = -1;
                     var xDiffFromKing = -1;
 
                     // X DIFFRENCE
+
                     if(Player_Pieces[j].x > x){ xDiffFromKing = Player_Pieces[j].x-x }
                     else{ xDiffFromKing = x-Player_Pieces[j].x }
                     // Y DIFFRENCE
@@ -520,10 +577,14 @@ class MainActivity : AppCompatActivity() {
                     else{ yDiffFromKing = y-Player_Pieces[j].y }
 
                     // GET BEST SCORE
-                    countMoveScore(xDiffFromKing,yDiffFromKing,x,y)
-//                    Toast.makeText(this, xDiffFromKing.toString()+"-"+yDiffFromKing, Toast.LENGTH_SHORT).show()
-                    break
-                }else{
+                    if(Player_Pieces[j].isKing){
+                        countMoveScore(xDiffFromKing,yDiffFromKing,x,y,pieceIdx,100)
+                    }
+                    else{
+                        countMoveScore(xDiffFromKing,yDiffFromKing,x,y,pieceIdx,5)
+                    }
+                }
+                else{
                     // Jika yang digerakkan adalah King
 
                     var yDiffFromBase = -1;
@@ -537,27 +598,55 @@ class MainActivity : AppCompatActivity() {
 
 
                     // GET BEST SCORE
-                    countMoveScore(xDiffFromBase,yDiffFromBase,x,y)
-//                    Toast.makeText(this, xDiffFromBase.toString()+"-"+yDiffFromBase, Toast.LENGTH_SHORT).show()
-
+                    countMoveScore(xDiffFromBase,yDiffFromBase,x,y,pieceIdx,2*(y+1))
                 }
             }
 
         }
     }
-    fun countMoveScore(xDiff:Int,yDiff:Int,xMove:Int,yMove:Int){
-        var score = 100
+    fun countMoveScore(xDiff:Int,yDiff:Int,xMove:Int,yMove:Int,pieceIdx: Int,bonusPoint:Int){
+        var score = 100+bonusPoint
         var debuff = xDiff*10 + yDiff*10
 
+        var ply2_score = predictPlayerMove(xMove,yMove)
+        score += ply2_score
         score-=debuff
 
         // MAX SCORE
+
         if(score > bestMoveScore){
             best_ai_card_idx = selectedCardIdx
+            selected_piece_idx = pieceIdx
             bestMoveScore = score
             bestMove[0] = xMove
             bestMove[1] = yMove
+
+
         }
-        Toast.makeText(this, bestMove[0].toString()+"-"+bestMove[1].toString(), Toast.LENGTH_SHORT).show()
+    }
+
+    fun checkKill(pieceList:ArrayList<Piece>,x:Int,y:Int){
+        for(i in 0..pieceList.size-1){
+            if(pieceList[i].x == x && pieceList[i].y == y){
+                if(pieceList[i].isKing){
+                    pieceList.removeAt(i)
+                    if(playerTurn){
+                        Toast.makeText(this, "You Win!", Toast.LENGTH_SHORT).show()
+                    }else{
+                        Toast.makeText(this, "You Lose!", Toast.LENGTH_SHORT).show()
+                    }
+                    break
+                }else{
+                    pieceList.removeAt(i)
+                    if(playerTurn){
+                        Toast.makeText(this, "You have slain an enemy!", Toast.LENGTH_SHORT).show()
+                    }else{
+                        Toast.makeText(this, "Enemy has slain your pawn!", Toast.LENGTH_SHORT).show()
+                    }
+                    break
+                }
+            }
+        }
+
     }
 }
