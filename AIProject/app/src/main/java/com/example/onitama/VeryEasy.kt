@@ -1,18 +1,17 @@
 package com.example.onitama
 
 import android.annotation.SuppressLint
-import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentManager
 import kotlinx.android.synthetic.main.activity_main.*
 
 class VeryEasy : AppCompatActivity() {
     lateinit var cards:ArrayList<Card> // List of all card (16 Type of Card)
     lateinit var playing_card: ArrayList<Card> // 5 Card that played in a game
+    lateinit var btPause : Button
 
     // GAME BOARD
     lateinit var board:ArrayList<ArrayList<Button>>
@@ -43,7 +42,7 @@ class VeryEasy : AppCompatActivity() {
     var selected_piece_idx = -1
 
     // RETRY AND QUIT FRAGMENT
-    lateinit var retryFragment : FrameLayout
+    lateinit var pauseOrRetryFragment : FrameLayout
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,9 +56,10 @@ class VeryEasy : AppCompatActivity() {
         }
         setContentView(R.layout.activity_main)
 
-        retryFragment = findViewById(R.id.retryFragment)
+        pauseOrRetryFragment = findViewById(R.id.pauseFragment)
+        btPause = findViewById(R.id.btPause)
 
-        retryFragment.visibility =FrameLayout.GONE
+        pauseFragment.visibility =FrameLayout.GONE
 
         // CARD RELATED INITIALIZATION FUNCTION
         initCard()
@@ -70,6 +70,22 @@ class VeryEasy : AppCompatActivity() {
         initBoard()
         initPiece()
 
+        btPause.setOnClickListener {
+            pauseFragment.visibility = FrameLayout.VISIBLE
+            val newFragment = PauseFragment.newInstance()
+            supportFragmentManager.beginTransaction().replace(R.id.pauseFragment, newFragment).commit()
+            newFragment.retry {
+                Player_Pieces.clear()
+                AI_Pieces.clear()
+                initCard()
+                randomPlayerCard()
+                initPanelCard()
+
+                // BOARD AND PIECES INITIALIZATION FUNCTION
+                initBoard()
+                initPiece()
+            }
+        }
         // CARD ON CLICK LISTENER
         cardEnemy1.setOnClickListener {
             if(isUnitSelected) {
@@ -467,9 +483,9 @@ class VeryEasy : AppCompatActivity() {
             checkKill(AI_Pieces,x,y)
             if(selectedPiece.isKing && x==2 && y==0){
                 Toast.makeText(this, "You Win!", Toast.LENGTH_SHORT).show()
-                retryFragment.visibility = FrameLayout.VISIBLE
+                pauseFragment.visibility = FrameLayout.VISIBLE
                 val newFragment = RetryFragment.newInstance()
-                supportFragmentManager.beginTransaction().replace(R.id.retryFragment, newFragment).commit()
+                supportFragmentManager.beginTransaction().replace(R.id.pauseFragment, newFragment).commit()
                 newFragment.retry {
                     Player_Pieces.clear()
                     AI_Pieces.clear()
@@ -498,9 +514,9 @@ class VeryEasy : AppCompatActivity() {
             checkKill(Player_Pieces,x,y)
             if(selectedPiece.isKing && x==2 && y==4){
                 Toast.makeText(this, "You Lose!", Toast.LENGTH_SHORT).show()
-                retryFragment.visibility = FrameLayout.VISIBLE
+                pauseFragment.visibility = FrameLayout.VISIBLE
                 val newFragment = RetryFragment.newInstance()
-                supportFragmentManager.beginTransaction().replace(R.id.retryFragment, newFragment).commit()
+                supportFragmentManager.beginTransaction().replace(R.id.pauseFragment, newFragment).commit()
                 newFragment.retry {
                     Player_Pieces.clear()
                     AI_Pieces.clear()
@@ -580,28 +596,7 @@ class VeryEasy : AppCompatActivity() {
             )
         }
     }
-//    fun predictPlayerMove(AI_x:Int,AI_y:Int):Int{
-//        //PLY
-//        for (i in 0..Player_Pieces.size - 1){
-//            // TRACE EVERY PLAYER CARD
-//            for(j in 0..playing_card[3].xMove.size-1){
-//                var xPredict = playing_card[3].xMove[j]+Player_Pieces[i].x
-//                var yPredict = playing_card[3].yMove[j]+Player_Pieces[i].y
-//                if(AI_x == xPredict && AI_y == yPredict){
-//                    return -20
-//                }
-//            }
-//            for(j in 0..playing_card[4].xMove.size-1){
-//                var xPredict = playing_card[4].xMove[j]+Player_Pieces[i].x
-//                var yPredict = playing_card[4].yMove[j]+Player_Pieces[i].y
-//                if(AI_x == xPredict && AI_y == yPredict){
-//                    return -20
-//                }
-//            }
-//
-//        }
-//        return 0
-//    }
+
     fun countSBE(x:Int,y:Int,king_moved:Boolean, pieceIdx:Int){
         for(i in 0..xMovePossible.size-1){
             for(j in 0..Player_Pieces.size-1){
@@ -648,11 +643,6 @@ class VeryEasy : AppCompatActivity() {
     }
     fun countMoveScore(xDiff:Int,yDiff:Int,xMove:Int,yMove:Int,pieceIdx: Int,bonusPoint:Int){
         var score = 100+bonusPoint
-        var debuff = xDiff*10 + yDiff*10
-
-//        var ply2_score = predictPlayerMove(xMove,yMove)
-//        score += ply2_score
-//        score-=debuff
 
         // MAX SCORE
 
@@ -674,9 +664,9 @@ class VeryEasy : AppCompatActivity() {
                     pieceList.removeAt(i)
                     if(playerTurn){
                         Toast.makeText(this, "You Win!", Toast.LENGTH_SHORT).show()
-                        retryFragment.visibility = FrameLayout.VISIBLE
+                        pauseFragment.visibility = FrameLayout.VISIBLE
                         val newFragment = RetryFragment.newInstance()
-                        supportFragmentManager.beginTransaction().replace(R.id.retryFragment, newFragment).commit()
+                        supportFragmentManager.beginTransaction().replace(R.id.pauseFragment, newFragment).commit()
                         newFragment.retry {
                             Player_Pieces.clear()
                             AI_Pieces.clear()
@@ -691,9 +681,9 @@ class VeryEasy : AppCompatActivity() {
                         break
                     }else{
                         Toast.makeText(this, "You Lose!", Toast.LENGTH_SHORT).show()
-                        retryFragment.visibility = FrameLayout.VISIBLE
+                        pauseFragment.visibility = FrameLayout.VISIBLE
                         val newFragment = RetryFragment.newInstance()
-                        supportFragmentManager.beginTransaction().replace(R.id.retryFragment, newFragment).commit()
+                        supportFragmentManager.beginTransaction().replace(R.id.pauseFragment, newFragment).commit()
                         newFragment.retry {
                             Player_Pieces.clear()
                             AI_Pieces.clear()

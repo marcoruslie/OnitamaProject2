@@ -8,10 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.FrameLayout
-import kotlinx.android.synthetic.main.fragment_retry.*
+import kotlinx.android.synthetic.main.fragment_pause.*
 
 
-class RetryFragment : Fragment() {
+class PauseFragment : Fragment() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,14 +26,19 @@ class RetryFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val btRetry = view.findViewById<Button>(R.id.btRetry)
-        val btBack = view.findViewById<Button>(R.id.btBack)
+        val btRetry = view.findViewById<Button>(R.id.btRetryPause)
+        val btBack = view.findViewById<Button>(R.id.btBackPause)
+        val btCont = view.findViewById<Button>(R.id.btContinue)
 
-        val retryFragment = activity?.findViewById<FrameLayout>(R.id.pauseFragment)
+        val pauseFragment = activity?.findViewById<FrameLayout>(R.id.pauseFragment)
+
+        btCont.setOnClickListener {
+            pauseFragment?.visibility = View.GONE
+        }
 
         btRetry.setOnClickListener {
             temp?.invoke()
-            retryFragment?.visibility = View.GONE
+            pauseFragment?.visibility = View.GONE
         }
 
         btBack.setOnClickListener {
@@ -49,7 +54,7 @@ class RetryFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_retry, container, false)
+        return inflater.inflate(R.layout.fragment_pause, container, false)
     }
 
     companion object {
@@ -64,7 +69,7 @@ class RetryFragment : Fragment() {
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance() =
-            RetryFragment().apply {
+            PauseFragment().apply {
                 arguments = Bundle()
             }
     }

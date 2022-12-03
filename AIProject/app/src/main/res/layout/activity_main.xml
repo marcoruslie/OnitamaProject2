@@ -11,7 +11,7 @@
     tools:context=".Easy">
 
     <FrameLayout
-        android:id="@+id/retryFragment"
+        android:id="@+id/pauseFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="visible">
@@ -44,6 +44,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:srcCompat="@drawable/monkey" />
+
         </LinearLayout>
 
         <LinearLayout
@@ -82,6 +83,13 @@
             android:layout_weight="1"
             android:gravity="center"
             android:orientation="vertical">
+
+            <Button
+                android:id="@+id/btPause"
+                android:layout_width="60dp"
+                android:layout_height="50dp"
+                android:background="#99000000"
+                app:icon="@drawable/ic_baseline_pause_circle_filled_24" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -306,6 +314,7 @@
 
                     />
             </LinearLayout>
+
         </LinearLayout>
 
         <LinearLayout
@@ -330,6 +339,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="101dp"
                 app:srcCompat="@drawable/cobra" />
+
         </LinearLayout>
 
     </LinearLayout>
