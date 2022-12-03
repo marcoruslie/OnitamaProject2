@@ -8,7 +8,15 @@
     android:backgroundTint="#9E000000"
     android:backgroundTintMode="src_over"
     android:orientation="vertical"
-    tools:context=".MainActivity">
+    tools:context=".Easy">
+
+    <FrameLayout
+        android:id="@+id/retryFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="visible">
+
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
