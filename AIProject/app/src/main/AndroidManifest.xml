@@ -14,13 +14,16 @@
         android:theme="@style/Theme.ONITAMA"
         tools:targetApi="31">
         <activity
+            android:name=".MainMenu"
+            android:exported="false" />
+        <activity
             android:name=".VeryEasy"
             android:exported="false" />
         <activity
             android:name=".Easy"
             android:exported="false" />
         <activity
-            android:name=".MainMenu"
+            android:name=".LoadingScreen"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
